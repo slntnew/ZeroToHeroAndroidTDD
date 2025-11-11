@@ -6,10 +6,12 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.contains
+import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
     private lateinit var textView: TextView
     private lateinit var layout: LinearLayout
+    private var state: State = State.Initial
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -17,22 +19,36 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.removeButton)
         layout = findViewById<LinearLayout>(R.id.rootLayout)
         button.setOnClickListener {
-            layout.removeView(textView)
+            state = State.Removed
+            state.apply(layout, textView)
         }
 
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY, layout.contains(textView))
+        outState.putSerializable(KEY, state)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        if (savedInstanceState.getBoolean(KEY, layout.contains(textView).not())) {
-            layout.removeView(textView)
+        state = savedInstanceState.getSerializable(KEY, State::class.java) as State
+        state.apply(layout, textView)
+
+    }
+
+    interface State: Serializable {
+        fun apply(linerLayout: LinearLayout, textView: TextView)
+
+        object Initial: State {
+            override fun apply(linerLayout: LinearLayout, textView: TextView) = Unit
         }
 
+        object Removed: State {
+            override fun apply(linerLayout: LinearLayout, textView: TextView) {
+                linerLayout.removeView(textView)
+            }
+        }
     }
 
     companion object {
