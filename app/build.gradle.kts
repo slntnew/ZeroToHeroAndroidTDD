@@ -5,12 +5,11 @@ plugins {
 
 android {
     namespace = "ru.easycode.zerotoheroandroidtdd"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ru.easycode.zerotoheroandroidtdd"
         minSdk = 21
-        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
